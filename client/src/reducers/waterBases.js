@@ -1,7 +1,7 @@
 import {
     GET_WATERBASES,
     FILTER_WATERBASES
-} from '../actions/action_constants';
+} from '../utils/ACTIONS_TYPES';
 
 export const initialState = {
     waterBasesList: [],

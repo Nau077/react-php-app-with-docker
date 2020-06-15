@@ -5,7 +5,7 @@ import {
     ENABLE_LOADING,
     REQUEST_IN_SUCCESS,
     REQUEST_IN_FAILURE 
-} from './action_constants';
+} from '../utils/ACTIONS_TYPES';
 import API from "../utils/API";
 
 const filterWaterBases = ({ rigion, rigions, waterBases }) => {
@@ -24,7 +24,7 @@ const filterWaterBases = ({ rigion, rigions, waterBases }) => {
     if (!isRigionAvailable) {
         return;
     }
- 
+    // eslint-disable-next-line
     return waterBases.filter(el => el.region_uuid == rigionId);
 };
  

@@ -1,6 +1,6 @@
 import {
     GET_RIGIONS
-} from '../actions/action_constants';
+} from '../utils/ACTIONS_TYPES';
 
 export const initialState = {
     rigionList: [],

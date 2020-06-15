@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { sendFormData } from '../../../../actions/actions';
 import { schema, convert, schemaValidate } from '../../../../utils/VALIDATIONS';
@@ -55,7 +55,8 @@ const useStyles = makeStyles((theme) => ({
 function Delivery__Form(props) {
  
     const dispatch = useDispatch();
-
+    // values - объекьт значений полей формы
+    // errors - объект ошибок валидации формы
     const [formState, setFormState] = useState({
         values: {
             rigion: '',
@@ -67,17 +68,19 @@ function Delivery__Form(props) {
         },
         errors: {}
     });
-
+    // контроль за состоянием компонента snackbar
+    // метод openSnackbar срабатывает только при успешной отправке формы
     const [openSnackbar, setOpenSnackbar] = React.useState(false);
 
     const handleCloseSnackbar = (event, reason) => {
         if (reason === 'clickaway') {
-          return;
+            return;
         }
     
         setOpenSnackbar(false);
-      };
-
+    };
+    // при изменении города по клику на карте, получаем новое значение в props
+    // => должны поменять состояние формы
     useEffect(() => {
         setFormState(state => ({
             values: { ...state.values, rigion: props.rigionValue },
@@ -102,7 +105,7 @@ function Delivery__Form(props) {
             setFormState( state => ({
                 values: { ...state.values, [name] : '' },
                 errors: { ...state.errors }
-                })
+            })
             );
             return;
         }
@@ -152,9 +155,11 @@ function Delivery__Form(props) {
     const handleSubmit = (callback) => {
         return async function (event) {
             event.preventDefault();
-            
-            let errors = await schema.validate(formState.values, { abortEarly : false })
-                .then(_ => ({})) // сбрасывает объект ошибок состояния, если ошибок нет
+            // валидация в данном случае идёт по всей схеме
+            const errors = await schema.validate(formState.values, { abortEarly : false })
+            // ф-ция возвращает null, поэтому нужен пустой объект, чтобы сбросить объект ошибок состояния
+            // если ошибок нет
+                .then(_ => ({})) 
                 .catch(convert);
 
             setFormState(state => ({
@@ -171,12 +176,22 @@ function Delivery__Form(props) {
     };
 
     const sendForm = (form) => {
-       new Promise((resolve) => {
-           dispatch(sendFormData(form, resolve))
-       })
-       .then(() => {
-            setOpenSnackbar(true);
-       })
+        new Promise((resolve) => {
+            dispatch(sendFormData(form, resolve));
+        })
+            .then(() => {
+                setOpenSnackbar(true);
+                setFormState(state => ({
+                    values: { 
+                        ...state.values,
+                        weight: '',
+                        adress: '',
+                        date: new Date(),
+                        upload: ''
+                    },
+                    errors: {}
+                }));
+            });
     };
 
     const getError = (state, prop) => {
@@ -190,96 +205,95 @@ function Delivery__Form(props) {
 
     return (
         <div className="form-container"> 
-        <Card className={classes.card}>
-            <CardContent> {
-                !props.rigionValue ? <CircularProgress />  :
-                <div className="form-wrapper">
+            <Card className={classes.card}>
+                <CardContent> {
+                    !props.rigionValue ? <CircularProgress />  :
+                        <div className="form-wrapper">
                 
-                <form className={classes.root} autoComplete="off" onSubmit={handleSubmit(form => {
-                    sendForm(form);
-                })}>
-                     <TextField 
-                        id="standard-required1" 
-                        label="Ваш регион"
-                        className={classes.textField}
-                        value={props.rigionValue}
-                        InputProps={{
-                            readOnly: true,
-                        }}
-                    />
-                    <Delivery__Form_Select handleSelectChange={handleSelectChange} name={formState.waterbase}/>
-                    {formState.errors && formState.errors.waterbase &&
+                            <form className={classes.root} autoComplete="off" onSubmit={handleSubmit(form => {
+                                sendForm(form);
+                            })}>
+                                <TextField 
+                                    id="standard-required1" 
+                                    label="Ваш регион"
+                                    className={classes.textField}
+                                    value={props.rigionValue}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                />
+                                <Delivery__Form_Select handleSelectChange={handleSelectChange} name={formState.waterbase}/>
+                                {formState.errors && formState.errors.waterbase &&
         <div>
             <p className="waterbase-error">Поле водобазы необходимо выбрать</p>
         </div>
-                    }
-                    <TextField 
-                        name="weight"
-                        id="standard-required2"
-                        label="Вес воды (тонны)"
-                        className={classes.textField}
-                        value={formState.values.weight}
-                        onChange={handleWeightChange('weight')}
-                        helperText={formState.errors.weight ? formState.errors.weight : ""}
-                        error={ getError(formState, 'weight')}
-                        InputProps={{
-                            inputComponent: Delivery__Form_Format,
-                            endAdornment: <InputAdornment position="end">T</InputAdornment>,
-                        }}
-                    />
-                    <TextField
-                        name="adress"
-                        label="Напишите адресс"
-                        value={formState.values.adress}
-                        onChange={handleChangeForm}
-                        fullWidth
-                        error={ getError(formState, 'adress')}
-                        helperText={formState.errors.adress ? formState.errors.adress : ""}
-                    />
-                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                        <KeyboardDatePicker
-                            disableToolbar
-                            variant="inline"
-                            format="MM/dd/yyyy"
-                            margin="normal"
-                            id="date-picker-inline"
-                            label="Выберите дату доставки"
-                            value={formState.values.date}
-                            onChange={handleDateChange('date')}
-                            helperText={formState.errors.date ? formState.errors.date : ""} 
-                            error={ getError(formState, 'date')}
-                            KeyboardButtonProps={{
-                                'aria-label': 'change date',
-                            }}
-                        />
-                    </MuiPickersUtilsProvider>
-                    <Delivery__Form_Upload handleUploadFile={handleUploadFile}/>
-                    <Button variant="outlined" className={classes.button} type="submit">
+                                }
+                                <TextField 
+                                    name="weight"
+                                    id="standard-required2"
+                                    label="Вес воды (тонны)"
+                                    className={classes.textField}
+                                    value={formState.values.weight}
+                                    onChange={handleWeightChange('weight')}
+                                    helperText={formState.errors.weight ? formState.errors.weight : ""}
+                                    error={ getError(formState, 'weight')}
+                                    InputProps={{
+                                        inputComponent: Delivery__Form_Format,
+                                        endAdornment: <InputAdornment position="end">T</InputAdornment>,
+                                    }}
+                                />
+                                <TextField
+                                    name="adress"
+                                    label="Напишите адрес"
+                                    value={formState.values.adress}
+                                    onChange={handleChangeForm}
+                                    fullWidth
+                                    error={ getError(formState, 'adress')}
+                                    helperText={formState.errors.adress ? formState.errors.adress : ""}
+                                />
+                                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                    <KeyboardDatePicker
+                                        disableToolbar
+                                        variant="inline"
+                                        format="MM/dd/yyyy"
+                                        margin="normal"
+                                        id="date-picker-inline"
+                                        label="Выберите дату доставки"
+                                        value={formState.values.date}
+                                        onChange={handleDateChange('date')}
+                                        helperText={formState.errors.date ? formState.errors.date : ""} 
+                                        error={ getError(formState, 'date')}
+                                        KeyboardButtonProps={{
+                                            'aria-label': 'change date',
+                                        }}
+                                    />
+                                </MuiPickersUtilsProvider>
+                                <Delivery__Form_Upload handleUploadFile={handleUploadFile}/>
+                                <Button variant="outlined" className={classes.button} type="submit">
             Отправить
-                    </Button>
-                </form>
-            </div>
+                                </Button>
+                            </form>
+                        </div>
                 }
                
-            </CardContent>
-        </Card>
+                </CardContent>
+            </Card>
          
-                    <Snackbar
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'left',
-                    }}
-                    open={openSnackbar}
-                    autoHideDuration={6000}
+            <Snackbar
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                }}
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+            >
+                <SnackBarWrapper
                     onClose={handleCloseSnackbar}
-                  >
-                    <SnackBarWrapper
-                      onClose={handleCloseSnackbar}
-                      variant="success"
-                      message="Форма успешно отправлена"
-                    />
-                  </Snackbar>
-        
+                    variant="success"
+                    message="Форма успешно отправлена"
+                />
+            </Snackbar>
         </div>
     );
 }

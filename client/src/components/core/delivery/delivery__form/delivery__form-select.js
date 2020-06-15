@@ -33,7 +33,7 @@ export default function Delivery__Form_Select(props) {
         } else {
             props.handleSelectChange('Не выбрана водобаза', '');
         }
-        //- eslint-disable-next-line
+        // eslint-disable-next-line
     }, [waterbasesMain, waterbases]);
 
     const handleChange = (event) => {

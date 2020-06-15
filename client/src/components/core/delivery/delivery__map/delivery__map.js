@@ -1,20 +1,21 @@
 import React, { useState } from 'react';
 import { YMaps, Map, Placemark } from "react-yandex-maps";
+import PropTypes from 'prop-types';
 
 function Delivery__Map(props) {
-
+    // 59.938924, 30.315311 - по дефолту карта настроена на Петербург
     const [mapData, setMapData] = useState({
         center: [59.938924, 30.315311],
         zoom: 8,
     });
-      
+    // Указатель тоже в области СПб выставлен
     const [coordinates, setCoordinates] = useState([[55.684758, 37.738521]]);
 
     const [YMapState, setYMapState] = useState('');
 
     const onMapClick = (event) => {
         event.stopPropagation();
-
+    // по клику извлекаем координаты, меняем координаты в состоянии компонента
         const coords = event.get("coords");
         setCoordinates([coords]);
         setMapData({
@@ -25,8 +26,9 @@ function Delivery__Map(props) {
         const myGeocoder = YMapState.geocode([coords]);
         myGeocoder.then(res => {
             let firstGeoObject = res.geoObjects.get(0);
-            const region = firstGeoObject.getAdministrativeAreas()[0];
-            props.setRigionHandler(region || "Укажите ближайший населенный пункт на карте");
+            // парсим по координатам название региона 
+            const rigion = firstGeoObject.getAdministrativeAreas()[0];
+            props.setRigionHandler(rigion || "Укажите ближайший населенный пункт на карте");
         });
         
     };
@@ -80,5 +82,10 @@ function Delivery__Map(props) {
         </div>
     );
 }
+
+Delivery__Map.propTypes = {
+    setRigionHandler: PropTypes.func.isRequired,
+};
+
 
 export default Delivery__Map;

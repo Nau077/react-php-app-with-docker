@@ -14,7 +14,7 @@ function App() {
 
     return (
         <div className="App">
-            <Delivery key={'delivery' }/>
+            <Delivery/>
         </div>
     );
 }

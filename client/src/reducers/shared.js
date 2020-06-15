@@ -2,7 +2,7 @@ import {
     ENABLE_LOADING,
     REQUEST_IN_SUCCESS,
     REQUEST_IN_FAILURE
-} from '../actions/action_constants';
+} from '../utils/ACTIONS_TYPES';
 
 export const initialState = {
     isLoading: false,

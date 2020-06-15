@@ -67,19 +67,17 @@ class Delivery__Form_Upload extends React.Component {
   handleUploadClick = event => {
       let file = event.target.files[0];
       const reader = new FileReader();
-      let url = '';
+      // проверка типа загружаемого документа
       if (reader && file && (file.type.match('image.*') || file.type.match('application/pdf'))) {
-          url = reader.readAsDataURL(file);
+          reader.readAsDataURL(file);
       } else {
           return;
       }
-    
+      // прокидываем файл наверх родителю
       this.props.handleUploadFile(file); 
 
       const name = event.target.files[0].name;
       const lastDot = name.lastIndexOf('.');
-
-      const fileName = name.substring(0, lastDot);
       const ext = name.substring(lastDot + 1);
 
       reader.onloadend = function(e) {

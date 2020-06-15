@@ -2,21 +2,21 @@
 
 abstract class Api
 {
-    public $apiName = ''; //users
+    public $apiName = '';
 
     protected $method = ''; //GET|POST|PUT|DELETE
 
     public $requestUri = [];
     public $requestParams = [];
 
-    protected $action = ''; //Название метод для выполнения
+    protected $action = ''; //Название метода для выполнения
 
     public function __construct() {
         header("Access-Control-Allow-Orgin: *");
         header("Access-Control-Allow-Methods: *");
         header("Content-Type: application/json");
         $rawPostBody = $_POST;
-        //Массив GET параметров разделенных слешем
+
         $this->requestUri = explode('/', trim($_SERVER['REQUEST_URI'],'/'));
         $this->requestParams = $_REQUEST;
 
@@ -41,7 +41,7 @@ abstract class Api
         //Определение действия для обработки
         $this->action = $this->getAction();
 
-        //Если метод(действие) определен в дочернем классе API
+        //Если метод(действие) определен в дочернем классе API, то вызывать его
         if (method_exists($this, $this->action)) {
             return $this->{$this->action}();
         } else {
