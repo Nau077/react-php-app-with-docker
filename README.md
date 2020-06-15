@@ -1,8 +1,8 @@
-### react + php + docker app
+# react + php + docker app
 
 ## install || установка
 
-# Для развёртывания проекта cначала необходимо установить docker и docker-compose
+## Для развёртывания проекта cначала необходимо установить docker и docker-compose
 
 Установка docker: https://docs.docker.com/engine/install/ <br/>
 Установка docker-compose: https://docs.docker.com/compose/install/ <br/>
