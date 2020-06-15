@@ -8,7 +8,7 @@
 Установка docker-compose: https://docs.docker.com/compose/install/ <br/>
 
 ## start || запуск 
-Для запуска в корне проекта друг за другом запустить следующиекоманды:<br/>
+Для запуска в корне проекта друг за другом запустить следующие команды:<br/>
 'make run/server', 'make build/client', make run/client<br/>
 
 # docker-compose includes || Из чего состоит docker-compose 
