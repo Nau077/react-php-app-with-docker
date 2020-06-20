@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 export default function Delivery__Form_Format(props) {
     const { inputRef, onChange, ...other } = props;
+    const weight = props.name;
     return (
         <NumberFormat
             {...other}
@@ -11,7 +12,7 @@ export default function Delivery__Form_Format(props) {
             onValueChange={values => {
                 onChange({
                     target: {
-                        name: values.name,
+                        name: weight,
                         value: values.value,
                     },
                 });

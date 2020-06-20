@@ -66,7 +66,7 @@ function Delivery__Form(props) {
             date: new Date(),
             upload: ''
         },
-        errors: {}
+        errors: null
     });
     // контроль за состоянием компонента snackbar
     // метод openSnackbar срабатывает только при успешной отправке формы
@@ -89,8 +89,17 @@ function Delivery__Form(props) {
     }, [props]);
     
     const handleChangeForm = async (event) => {
- 
         const { target : { name, value } } = event;
+
+        if (name == 'weight' && formState.values[name].toString().charAt(0) == '.') {
+            setFormState( state => ({
+                values: { ...state.values, [name] : '' },
+                errors: { ...state.errors }
+            })
+            );
+            return;
+        }
+ 
         const errors = await schemaValidate(name, value);
         
         setFormState(state => ({
@@ -99,29 +108,6 @@ function Delivery__Form(props) {
         }));
     };
 
-    const handleWeightChange = name =>  event => {
-
-        if (formState.values[name] && formState.values[name].toString().charAt(0) == '.') {
-            setFormState( state => ({
-                values: { ...state.values, [name] : '' },
-                errors: { ...state.errors }
-            })
-            );
-            return;
-        }
-
-        (async function errors() {
-            const value = event.target.value;
-            const errors = await schemaValidate(name, value);
-
-            setFormState( state => ({
-                values: { ...state.values, [name] : value },
-                errors: { ...state.errors, ...errors }
-            })
-            );
-        }());
-       
-    };
 
     const handleDateChange = name => value => {
         
@@ -182,16 +168,27 @@ function Delivery__Form(props) {
             .then(() => {
                 setOpenSnackbar(true);
                 setFormState(state => ({
-                    values: { 
+                    values: {
                         ...state.values,
                         weight: '',
                         adress: '',
                         date: new Date(),
                         upload: ''
                     },
-                    errors: {}
-                }));
-            });
+                    errors: {
+                        ...state.errors
+                    }
+                }))
+               setTimeout(() => {
+                setFormState(state => ({
+                    values: {
+                        ...state.values,
+                    },
+                    errors: {
+                    }
+                })) 
+               }, 0);
+            })
     };
 
     const getError = (state, prop) => {
@@ -234,7 +231,7 @@ function Delivery__Form(props) {
                                     label="Вес воды (тонны)"
                                     className={classes.textField}
                                     value={formState.values.weight}
-                                    onChange={handleWeightChange('weight')}
+                                    onChange={handleChangeForm}
                                     helperText={formState.errors.weight ? formState.errors.weight : ""}
                                     error={ getError(formState, 'weight')}
                                     InputProps={{
