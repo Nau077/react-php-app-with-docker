@@ -130,7 +130,6 @@ function Delivery__Form(props) {
         });
     };
 
-
     const handleUploadFile = value => {
         setFormState({
             values: { ...formState.values, upload : value },
